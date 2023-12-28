@@ -1,27 +1,23 @@
-from flask import Flask, request, jsonify
-from flask_smorest import Api, Blueprint, abort
-import json
-import uuid
-from db import stores, items
+from flask import Flask
+from flask_smorest import Api
 
 app = Flask(__name__)
 
-@app.get('/')
-def return_nothing():
-    return "Nothing"
+from resources.item import blp as ItemBlueprint
+from resources.store import blp as StoreBlueprint
 
-@app.get('/stores')
-def get_stores():
-    if not stores:
-        abort(404, message="No stores yet")
-    else:
-        return "stores"
+app.config["PROPAGATE_EXCEPTIONS"] = True
+app.config["API_TITLE"] = "Flask_stores_api"
+app.config["API_VERSION"] = "v1"
+app.config["OPENAPI_VERSION"] = "3.0.3"
+app.config["OPENAPI_URL_PREFIX"] = "/"
+app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger-ui"
+app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
 
 
-@app.get('/store/<int:store_id>')
-def get_store(store_id):
-    try:
-        return f"ID: {store_id}"
-    except TypeError:
-        abort(404, message = "Store not found")
+api = Api(app)
+
+api.register_blueprint(ItemBlueprint)
+api.register_blueprint(StoreBlueprint)
+
 
